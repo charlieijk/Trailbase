@@ -1,7 +1,7 @@
-import bootStrapLogo from '../assets/img/bootstrap-logo.png';
-import gitLogo from '../assets/img/git-logo.png';
-import mongoLogo from '../assets/img/mongo-logo.png';
-import nodeLogo from '../assets/img/node-logo.png';
+import bootStrapLogo from '../../assets/img/bootstrap-logo.png';
+import gitLogo from '../../assets/img/git-logo.png';
+import mongoLogo from '../../assets/img/mongo-logo.png';
+import nodeLogo from '../../assets/img/node-logo.png';
 
 export const PARTNERS = [
     {
