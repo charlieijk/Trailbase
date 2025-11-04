@@ -33,7 +33,7 @@
     "skipLibCheck": true,
 
     /* Allow JS and Gradual Migration */
-    "allowJs": true,
+    "allowJs": false,
     "checkJs": false,
     "incremental": true,
 
