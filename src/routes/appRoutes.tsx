@@ -35,6 +35,13 @@ export const appRoutes: ReadonlyArray<AppRouteDefinition> = [
     includeInNav: true,
   },
   {
+    id: 'signup',
+    path: '/signup',
+    label: 'Sign Up',
+    icon: 'fa-user-plus',
+    includeInNav: true,
+  },
+  {
     id: 'not-found',
     path: '/404',
     label: 'Not Found',

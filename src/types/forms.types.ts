@@ -18,3 +18,14 @@ export interface UserLoginFormValues {
   username: string;
   password: string;
 }
+
+export interface UserSignupFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+  subscribeToNews: boolean;
+}

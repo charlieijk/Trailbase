@@ -34,7 +34,9 @@ const Header: FC = () => {
           {navigationItems.map(({ id, path, label, icon }) => (
             <NavItem key={id}>
               <Link
-                className={`nav-link${isActive(path) ? ' active' : ''}`}
+                className={`nav-link${path === '/signup' ? ' nav-link--cta' : ''}${
+                  isActive(path) ? ' active' : ''
+                }`}
                 href={path}
                 onClick={() => setMenuOpen(false)}
               >

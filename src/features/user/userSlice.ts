@@ -6,6 +6,10 @@ export interface CurrentUser {
   avatar: string;
   username: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  subscribedToNews?: boolean;
 }
 
 interface UserState {
