@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { PARTNERS } from '../../app/shared/oldData/PARTNERS';
+import { PARTNERS } from '../../data/legacy/partners';
 import type { LegacyPartner } from '../../types/legacy.types';
-import type { RootState } from '../../app/store';
+import type { RootState } from '../../state/store';
 
 interface PartnersState {
   partnersArray: LegacyPartner[];

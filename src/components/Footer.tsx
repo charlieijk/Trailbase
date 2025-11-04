@@ -1,6 +1,7 @@
 import type { FC } from 'react';
+import Link from 'next/link';
 import { Container, Row, Col } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { navigationItems } from '../routes/appRoutes';
 
 const Footer: FC = () => (
   <footer className="site-footer">
@@ -9,18 +10,13 @@ const Footer: FC = () => (
         <Col xs={{ size: 4, offset: 1 }} sm="2">
           <h5>Links</h5>
           <ul className="list-unstyled">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/directory">Directory</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-            <li>
-              <Link to="/contact">Contact</Link>
-            </li>
+            {navigationItems.map(({ id, path, label }) => (
+              <li key={id}>
+                <Link href={path} className="text-decoration-none">
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </Col>
         <Col xs="6" sm="3" className="text-center">

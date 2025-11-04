@@ -18,3 +18,4 @@ export * from './common.types';
 export * from './api.types';
 export * from './legacy.types';
 export * from './forms.types';
+export * from './navigation.types';

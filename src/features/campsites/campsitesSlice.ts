@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { LegacyCampsite } from '../../types/legacy.types';
-import { CAMPSITES } from '../../app/shared/oldData/CAMPSITES';
-import type { RootState } from '../../app/store';
+import { CAMPSITES } from '../../data/legacy/campsites';
+import type { RootState } from '../../state/store';
 
 interface CampsitesState {
   campsitesArray: LegacyCampsite[];

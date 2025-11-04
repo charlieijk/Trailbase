@@ -1,3 +1,5 @@
+"use client";
+
 import type { FC, CSSProperties } from 'react';
 import { useState, useEffect } from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle } from 'reactstrap';

@@ -1,6 +1,8 @@
+"use client";
+
 import type { FC } from 'react';
 import { Col, Row } from 'reactstrap';
-import { useAppSelector } from '../../app/hooks';
+import { useAppSelector } from '../../state/hooks';
 import Comment from './Comment';
 import {
   selectCommentsByCampsiteId,

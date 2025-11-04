@@ -4,12 +4,13 @@
   "description": "Full-stack TypeScript campsite booking platform built with Next.js 14, Prisma, and PostgreSQL",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
+    "next": "^14.1.0",
     "@reduxjs/toolkit": "^1.9.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -21,8 +22,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
-    "react-router-dom": "^6.8.0",
-    "react-scripts": "5.0.1",
     "reactstrap": "^9.1.5",
     "typeface-lobster": "^1.1.13",
     "typeface-open-sans": "^1.1.13",

@@ -1,7 +1,8 @@
+"use client";
+
 import type { FC } from 'react';
 import { Container, Row } from 'reactstrap';
-import { useParams } from 'react-router-dom';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector } from '../state/hooks';
 import {
   selectCampsiteById,
   selectCampsitesError,
@@ -13,9 +14,11 @@ import SubHeader from '../components/SubHeader';
 import Error from '../components/Error';
 import Loading from '../components/Loading';
 
-const CampsiteDetailPage: FC = () => {
-  const params = useParams<{ campsiteId: string }>();
-  const campsiteId = params.campsiteId ? Number(params.campsiteId) : undefined;
+interface CampsiteDetailPageProps {
+  campsiteId?: number;
+}
+
+const CampsiteDetailPage: FC<CampsiteDetailPageProps> = ({ campsiteId }) => {
   const campsite = useAppSelector(selectCampsiteById(campsiteId));
   const isLoading = useAppSelector(selectCampsitesLoading);
   const errMsg = useAppSelector(selectCampsitesError);

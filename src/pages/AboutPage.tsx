@@ -1,3 +1,5 @@
+"use client";
+
 import type { FC } from 'react';
 import { Col, Row, Container, Card, CardBody, CardHeader } from 'reactstrap';
 import SubHeader from '../components/SubHeader';

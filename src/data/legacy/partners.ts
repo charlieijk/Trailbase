@@ -1,14 +1,10 @@
-import type { LegacyPartner } from '../../../types/legacy.types';
-import bootStrapLogo from '../../assets/img/bootstrap-logo.png';
-import gitLogo from '../../assets/img/git-logo.png';
-import mongoLogo from '../../assets/img/mongo-logo.png';
-import nodeLogo from '../../assets/img/node-logo.png';
+import type { LegacyPartner } from '../../types/legacy.types';
 
 export const PARTNERS: LegacyPartner[] = [
   {
     id: 0,
     name: 'Bootstrap Outfitters',
-    image: bootStrapLogo,
+    image: '/assets/img/bootstrap-logo.png',
     featured: false,
     description:
       "Bootstrap Outfitters supplies you with the gear you need at prices you can't beat.",
@@ -16,7 +12,7 @@ export const PARTNERS: LegacyPartner[] = [
   {
     id: 1,
     name: 'Git Out Expeditions',
-    image: gitLogo,
+    image: '/assets/img/git-logo.png',
     featured: false,
     description:
       'Join Git Out Expeditions to explore new horizons with a group of other adventurers!',
@@ -24,7 +20,7 @@ export const PARTNERS: LegacyPartner[] = [
   {
     id: 2,
     name: 'Mongo Fly Shop',
-    image: mongoLogo,
+    image: '/assets/img/mongo-logo.png',
     featured: false,
     description:
       'Need a new fishing pole, a tacklebox, or flies of all kinds? Stop by Mongo Fly Shop.',
@@ -32,7 +28,7 @@ export const PARTNERS: LegacyPartner[] = [
   {
     id: 3,
     name: 'Node Outdoor Apparel',
-    image: nodeLogo,
+    image: '/assets/img/node-logo.png',
     featured: true,
     description:
       'From polar fleeces to swimsuits, hiking boots to waders, a visit to Node will be sure to get you covered.',

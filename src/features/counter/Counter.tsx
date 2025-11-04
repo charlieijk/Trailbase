@@ -1,3 +1,5 @@
+"use client";
+
 import type { FC, ChangeEvent } from 'react';
 import { useState } from 'react';
 import {
@@ -9,7 +11,7 @@ import {
   selectCount,
 } from './counterSlice';
 import styles from './Counter.module.css';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../state/hooks';
 
 const Counter: FC = () => {
   const count = useAppSelector(selectCount);

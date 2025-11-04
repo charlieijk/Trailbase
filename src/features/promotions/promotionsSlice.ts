@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { PROMOTIONS } from '../../app/shared/oldData/PROMOTIONS';
+import { PROMOTIONS } from '../../data/legacy/promotions';
 import type { LegacyPromotion } from '../../types/legacy.types';
-import type { RootState } from '../../app/store';
+import type { RootState } from '../../state/store';
 
 interface PromotionsState {
   promotionsArray: LegacyPromotion[];

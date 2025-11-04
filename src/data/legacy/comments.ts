@@ -1,4 +1,4 @@
-import type { LegacyComment } from '../../../types/legacy.types';
+import type { LegacyComment } from '../../types/legacy.types';
 
 export const COMMENTS: LegacyComment[] = [
   {
@@ -158,7 +158,7 @@ export const COMMENTS: LegacyComment[] = [
     campsiteId: 3,
     rating: 5,
     text: "The photos don't do justice to the beauty of this place.",
-    author: 'Minae Lee',
-    date: '2019-02-18T18:12Z',
+    author: 'Colina Mundy',
+    date: '2018-07-23T19:44Z',
   },
 ];

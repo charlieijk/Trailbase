@@ -2,14 +2,16 @@
   "compilerOptions": {
     /* Language and Environment */
     "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "jsx": "preserve",
     /* Modules */
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-
     /* Type Checking */
     "strict": true,
     "noUnusedLocals": false,
@@ -18,40 +20,65 @@
     "noImplicitReturns": false,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
-
     /* Emit */
     "declaration": false,
     "sourceMap": true,
     "noEmit": true,
-
     /* Interop Constraints */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-
     /* Skip Lib Check */
     "skipLibCheck": true,
-
     /* Allow JS and Gradual Migration */
     "allowJs": false,
     "checkJs": false,
     "incremental": true,
-
     /* Path Mapping */
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/types/*": ["./types/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/components/*": ["./components/*"],
-      "@/features/*": ["./features/*"],
-      "@/pages/*": ["./pages/*"],
-      "@/app/*": ["./app/*"],
-      "@/utils/*": ["./utils/*"]
-    }
+      "@/*": [
+        "src/*"
+      ],
+      "@/types/*": [
+        "src/types/*"
+      ],
+      "@/lib/*": [
+        "src/lib/*"
+      ],
+      "@/components/*": [
+        "src/components/*"
+      ],
+      "@/features/*": [
+        "src/features/*"
+      ],
+      "@/pages/*": [
+        "src/pages/*"
+      ],
+      "@/app/*": [
+        "src/app/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ],
+      "@/state/*": [
+        "src/state/*"
+      ],
+      "@/data/*": [
+        "src/data/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "src/**/*"
+    "next-env.d.ts",
+    "src/**/*",
+    "next.config.js",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

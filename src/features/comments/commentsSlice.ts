@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { LegacyComment } from '../../types/legacy.types';
-import { COMMENTS } from '../../app/shared/oldData/COMMENTS';
-import type { RootState } from '../../app/store';
+import { COMMENTS } from '../../data/legacy/comments';
+import type { RootState } from '../../state/store';
 
 interface CommentsState {
   commentsArray: LegacyComment[];

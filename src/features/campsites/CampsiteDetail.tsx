@@ -1,3 +1,5 @@
+"use client";
+
 import type { FC } from 'react';
 import { Card, CardImg, CardText, CardBody, Col } from 'reactstrap';
 import type { LegacyCampsite } from '../../types/legacy.types';

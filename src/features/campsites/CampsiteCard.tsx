@@ -1,6 +1,8 @@
+"use client";
+
 import type { FC } from 'react';
+import Link from 'next/link';
 import { Card, CardImg, CardImgOverlay, CardTitle } from 'reactstrap';
-import { Link } from 'react-router-dom';
 import type { LegacyCampsite } from '../../types/legacy.types';
 
 interface CampsiteCardProps {
@@ -11,7 +13,7 @@ const CampsiteCard: FC<CampsiteCardProps> = ({ campsite }) => {
   const { id, image, name } = campsite;
 
   return (
-    <Link to={`${id}`}>
+    <Link href={`/directory/${id}`} className="text-decoration-none">
       <Card>
         <CardImg width="100%" src={image} alt={name} />
         <CardImgOverlay>
