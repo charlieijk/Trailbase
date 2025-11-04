@@ -284,10 +284,15 @@ export function isSuccessfulPayment(payment: Payment): boolean {
 }
 
 export function isRefundable(payment: Payment): boolean {
-  return (
-    payment.status === PaymentStatus.SUCCEEDED &&
-    (!payment.refundedAt || payment.status === PaymentStatus.PARTIALLY_REFUNDED)
-  );
+  if (payment.status === PaymentStatus.PARTIALLY_REFUNDED) {
+    return true;
+  }
+
+  if (payment.status === PaymentStatus.SUCCEEDED) {
+    return !payment.refundedAt;
+  }
+
+  return false;
 }
 
 export function canBeDisputed(payment: Payment): boolean {

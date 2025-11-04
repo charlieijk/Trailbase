@@ -7,7 +7,7 @@ import type {
   Email,
   PhoneNumber,
   URL,
-  BaseEntity,
+  BaseEntityWithStatus,
   Address,
   Image,
   ISODateString

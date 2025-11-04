@@ -187,10 +187,17 @@ export interface Booking extends BaseEntity {
   ownerReviewed: boolean;
 }
 
+export interface BookingUserSummary {
+  id: UUID;
+  profile: User['profile'];
+  contactInfo: User['contactInfo'];
+  verificationStatus: User['verificationStatus'];
+}
+
 // Booking with populated data
 export interface BookingWithDetails extends Booking {
   campsite: CampsiteListItem;
-  user: Pick<User, 'id' | 'profile' | 'contactInfo' | 'verificationStatus'>;
+  user: BookingUserSummary;
 }
 
 // Booking creation
