@@ -1,0 +1,791 @@
+// ============================================================================
+// Trailbase Database Schema
+// ============================================================================
+// Complete Prisma schema for the Trailbase campsite booking platform
+// Includes: Users, Campsites, Bookings, Reviews, Payments, and more
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  CAMPER
+  OWNER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  DELETED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum CampsiteStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CampsiteCategory {
+  TENT
+  RV
+  CABIN
+  GLAMPING
+  GROUP
+}
+
+enum TerrainType {
+  MOUNTAIN
+  FOREST
+  BEACH
+  DESERT
+  LAKESIDE
+  RIVERSIDE
+  PRAIRIE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  FAILED
+}
+
+enum CancellationPolicy {
+  FLEXIBLE
+  MODERATE
+  STRICT
+  SUPER_STRICT
+}
+
+enum CancellationReason {
+  GUEST_CHANGE_PLANS
+  GUEST_EMERGENCY
+  GUEST_OTHER
+  HOST_UNAVAILABLE
+  HOST_EMERGENCY
+  WEATHER
+  SAFETY_CONCERN
+  SYSTEM_ERROR
+  ADMIN_DECISION
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  FLAGGED
+  REMOVED
+}
+
+enum FlagReason {
+  INAPPROPRIATE
+  SPAM
+  OFFENSIVE
+  OFF_TOPIC
+  FAKE
+  OTHER
+}
+
+enum AmenityCategory {
+  ESSENTIAL
+  COMFORT
+  RECREATION
+  SAFETY
+}
+
+// ============================================================================
+// USER MODELS
+// ============================================================================
+
+model User {
+  id        String        @id @default(uuid())
+  email     String        @unique
+  name      String
+  role      UserRole      @default(CAMPER)
+  accountStatus AccountStatus @default(ACTIVE)
+
+  // Authentication
+  hashedPassword String?
+  emailVerified  Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  phoneVerified  Boolean   @default(false)
+  phoneVerifiedAt DateTime?
+
+  // Profile
+  avatarUrl  String?
+  bio        String?
+  phone      String?
+
+  // Address
+  street   String?
+  city     String?
+  state    String?
+  zipCode  String?
+  country  String?  @default("US")
+
+  // Verification
+  identityVerificationStatus VerificationStatus @default(UNVERIFIED)
+
+  // Settings
+  language             String  @default("en")
+  timezone             String  @default("UTC")
+  currency             String  @default("USD")
+  emailNotifications   Boolean @default(true)
+  smsNotifications     Boolean @default(false)
+  pushNotifications    Boolean @default(true)
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  // Relations
+  campsites       Campsite[]
+  bookings        Booking[]
+  reviews         Review[]
+  ownerResponses  OwnerResponse[]
+  identityDocuments IdentityDocument[]
+  payoutMethods   PayoutMethod[]
+  favorites       Favorite[]
+  messages        Message[]
+  notifications   Notification[]
+  activities      UserActivity[]
+
+  // NextAuth
+  accounts      Account[]
+  sessions      Session[]
+
+  @@index([email])
+  @@index([role])
+  @@index([accountStatus])
+  @@map("users")
+}
+
+// NextAuth Account model
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+// NextAuth Session model
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// NextAuth VerificationToken model
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model IdentityDocument {
+  id             String             @id @default(uuid())
+  userId         String
+  type           String // PASSPORT, DRIVERS_LICENSE, etc
+  documentNumber String
+  frontImageUrl  String
+  backImageUrl   String?
+  expiryDate     DateTime
+  verificationStatus VerificationStatus @default(PENDING)
+  rejectionReason String?
+  uploadedAt     DateTime           @default(now())
+  verifiedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("identity_documents")
+}
+
+model PayoutMethod {
+  id                String   @id @default(uuid())
+  userId            String
+  type              String // BANK_ACCOUNT, PAYPAL, STRIPE
+  isDefault         Boolean  @default(false)
+
+  // Bank account (masked)
+  bankName          String?
+  accountLast4      String?
+  routingNumber     String?
+
+  // PayPal
+  paypalEmail       String?
+
+  // Stripe
+  stripeAccountId   String?
+
+  createdAt DateTime @default(now())
+  verifiedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payout_methods")
+}
+
+model UserActivity {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String // LOGIN, LOGOUT, etc
+  description String
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("user_activities")
+}
+
+// ============================================================================
+// CAMPSITE MODELS
+// ============================================================================
+
+model Campsite {
+  id          String          @id @default(uuid())
+  name        String
+  slug        String          @unique
+  description String          @db.Text
+  category    CampsiteCategory
+  status      CampsiteStatus  @default(DRAFT)
+  featured    Boolean         @default(false)
+
+  // Capacity
+  maxGuests    Int
+  maxVehicles  Int?
+  bedrooms     Int?
+  bathrooms    Int?
+
+  // Pricing
+  pricePerNight Float
+  cleaningFee   Float?
+
+  // Terrain
+  terrainType TerrainType
+  elevation   Int?
+  siteSize    Int?
+
+  // Main image
+  imageUrl String
+
+  // Owner
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  // Relations
+  location       Location?
+  amenities      CampsiteAmenity[]
+  images         CampsiteImage[]
+  rules          CampsiteRules?
+  seasonalRates  SeasonalRate[]
+  bookings       Booking[]
+  reviews        Review[]
+  blockedDates   BlockedDate[]
+  favorites      Favorite[]
+
+  @@index([slug])
+  @@index([ownerId])
+  @@index([status])
+  @@index([category])
+  @@index([featured])
+  @@map("campsites")
+}
+
+model Location {
+  id         String   @id @default(uuid())
+  campsiteId String   @unique
+  address    String
+  city       String
+  state      String
+  zipCode    String
+  country    String   @default("US")
+  latitude   Float
+  longitude  Float
+
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+
+  @@index([city, state])
+  @@index([latitude, longitude])
+  @@map("locations")
+}
+
+model Amenity {
+  id       String          @id @default(uuid())
+  name     String          @unique
+  icon     String?
+  category AmenityCategory
+
+  campsites CampsiteAmenity[]
+
+  @@map("amenities")
+}
+
+model CampsiteAmenity {
+  campsiteId String
+  amenityId  String
+
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+  amenity  Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([campsiteId, amenityId])
+  @@map("campsite_amenities")
+}
+
+model CampsiteImage {
+  id         String   @id @default(uuid())
+  campsiteId String
+  url        String
+  alt        String
+  caption    String?
+  order      Int
+  isMain     Boolean  @default(false)
+
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+
+  @@index([campsiteId])
+  @@map("campsite_images")
+}
+
+model CampsiteRules {
+  id                String   @id @default(uuid())
+  campsiteId        String   @unique
+  checkInTime       String
+  checkOutTime      String
+  minimumStay       Int
+  maximumStay       Int?
+  petsAllowed       Boolean  @default(false)
+  smokingAllowed    Boolean  @default(false)
+  partiesAllowed    Boolean  @default(false)
+  quietHoursStart   String?
+  quietHoursEnd     String?
+  customRules       String[] @default([])
+
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+
+  @@map("campsite_rules")
+}
+
+model SeasonalRate {
+  id            String   @id @default(uuid())
+  campsiteId    String
+  startDate     DateTime
+  endDate       DateTime
+  pricePerNight Float
+  minimumStay   Int?
+
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+
+  @@index([campsiteId])
+  @@map("seasonal_rates")
+}
+
+model BlockedDate {
+  id         String   @id @default(uuid())
+  campsiteId String
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+
+  @@index([campsiteId])
+  @@map("blocked_dates")
+}
+
+// ============================================================================
+// BOOKING MODELS
+// ============================================================================
+
+model Booking {
+  id          String        @id @default(uuid())
+  campsiteId  String
+  userId      String
+
+  // Dates
+  startDate      DateTime
+  endDate        DateTime
+  numberOfNights Int
+
+  // Guests
+  adults      Int
+  children    Int
+  pets        Int
+  totalGuests Int
+
+  // Status
+  status        BookingStatus
+  paymentStatus PaymentStatus @default(PENDING)
+
+  // Pricing
+  pricePerNight Float
+  totalNights   Int
+  subtotal      Float
+  cleaningFee   Float          @default(0)
+  serviceFee    Float          @default(0)
+  taxes         Float          @default(0)
+  totalAmount   Float
+
+  // Payment tracking
+  paidAmount     Float @default(0)
+  refundedAmount Float @default(0)
+
+  // Cancellation
+  cancellationPolicy CancellationPolicy @default(FLEXIBLE)
+  cancelledAt        DateTime?
+  cancelledBy        String?
+  cancellationReason CancellationReason?
+
+  // Optional fields
+  specialRequests String?
+  arrivalTime     String?
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  confirmedAt DateTime?
+  checkInAt   DateTime?
+  checkOutAt  DateTime?
+
+  // Relations
+  campsite     Campsite           @relation(fields: [campsiteId], references: [id])
+  user         User               @relation(fields: [userId], references: [id])
+  payment      Payment?
+  cancellation CancellationDetails?
+  modifications BookingModification[]
+  checkIn      CheckInData?
+  checkOut     CheckOutData?
+
+  @@index([campsiteId])
+  @@index([userId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@map("bookings")
+}
+
+model Payment {
+  id                     String        @id @default(uuid())
+  bookingId              String        @unique
+  amount                 Float
+  currency               String        @default("USD")
+  status                 PaymentStatus @default(PENDING)
+  method                 String // CARD, BANK_TRANSFER, etc
+
+  // Card details (masked)
+  cardLast4   String?
+  cardBrand   String?
+
+  // Stripe
+  stripePaymentIntentId String?
+  stripeChargeId        String?
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  capturedAt  DateTime?
+  failedAt    DateTime?
+  failureReason String?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  refunds Refund[]
+
+  @@index([bookingId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Refund {
+  id              String   @id @default(uuid())
+  paymentId       String
+  bookingId       String
+  amount          Float
+  reason          String
+  status          String // PENDING, SUCCEEDED, FAILED
+  stripeRefundId  String?
+  createdAt       DateTime @default(now())
+  processedAt     DateTime?
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("refunds")
+}
+
+model CancellationDetails {
+  id                String             @id @default(uuid())
+  bookingId         String             @unique
+  cancelledBy       String
+  cancelledByRole   String // GUEST, HOST, ADMIN
+  cancelledAt       DateTime           @default(now())
+  reason            CancellationReason
+  reasonDetails     String?
+  refundAmount      Float
+  refundPercentage  Float
+  refundProcessed   Boolean            @default(false)
+  refundProcessedAt DateTime?
+  policyApplied     CancellationPolicy
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("cancellation_details")
+}
+
+model BookingModification {
+  id                String   @id @default(uuid())
+  bookingId         String
+  modificationType  String // DATES, GUESTS, etc
+  previousValues    Json
+  newValues         Json
+  priceDifference   Float?
+  requiresApproval  Boolean  @default(false)
+  approved          Boolean?
+  approvedBy        String?
+  approvedAt        DateTime?
+  rejectionReason   String?
+  requestedBy       String
+  createdAt         DateTime @default(now())
+  processedAt       DateTime?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_modifications")
+}
+
+model CheckInData {
+  id            String   @id @default(uuid())
+  bookingId     String   @unique
+  checkInTime   DateTime
+  guestsPresent Int
+  vehicleInfo   Json?
+  notes         String?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("check_in_data")
+}
+
+model CheckOutData {
+  id           String   @id @default(uuid())
+  bookingId    String   @unique
+  checkOutTime DateTime
+  condition    String // EXCELLENT, GOOD, FAIR, POOR
+  damages      Json?
+  notes        String?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("check_out_data")
+}
+
+// ============================================================================
+// REVIEW MODELS
+// ============================================================================
+
+model Review {
+  id          String       @id @default(uuid())
+  campsiteId  String
+  userId      String
+  bookingId   String
+
+  // Ratings (1-5)
+  overallRating   Int
+  cleanliness     Int
+  accuracy        Int
+  location        Int
+  value           Int
+  communication   Int
+
+  // Content
+  title           String?
+  content         String        @db.Text
+  photos          String[]      @default([])
+
+  // Verification
+  isVerifiedStay Boolean @default(false)
+  stayDate       DateTime
+
+  // Status
+  status ReviewStatus @default(PENDING)
+
+  // Engagement
+  helpfulCount   Int @default(0)
+  unhelpfulCount Int @default(0)
+
+  // Response
+  hasOwnerResponse Boolean @default(false)
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  // Relations
+  campsite      Campsite       @relation(fields: [campsiteId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  ownerResponse OwnerResponse?
+  flags         ReviewFlag[]
+  helpful       ReviewHelpful[]
+
+  @@index([campsiteId])
+  @@index([userId])
+  @@index([status])
+  @@index([overallRating])
+  @@map("reviews")
+}
+
+model OwnerResponse {
+  id        String   @id @default(uuid())
+  reviewId  String   @unique
+  ownerId   String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  owner  User   @relation(fields: [ownerId], references: [id])
+
+  @@map("owner_responses")
+}
+
+model ReviewHelpful {
+  id        String   @id @default(uuid())
+  reviewId  String
+  userId    String
+  helpful   Boolean // true = helpful, false = unhelpful
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@map("review_helpful")
+}
+
+model ReviewFlag {
+  id          String     @id @default(uuid())
+  reviewId    String
+  reportedBy  String
+  reason      FlagReason
+  details     String?
+  status      String     @default("PENDING") // PENDING, REVIEWED, RESOLVED, DISMISSED
+  reviewedBy  String?
+  resolution  String?
+  createdAt   DateTime   @default(now())
+  resolvedAt  DateTime?
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([status])
+  @@map("review_flags")
+}
+
+// ============================================================================
+// ADDITIONAL FEATURES
+// ============================================================================
+
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String
+  campsiteId String
+  addedAt    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campsite Campsite @relation(fields: [campsiteId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, campsiteId])
+  @@index([userId])
+  @@map("favorites")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  subject    String?
+  content    String   @db.Text
+  read       Boolean  @default(false)
+  readAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  sender   User @relation(fields: [senderId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@map("messages")
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  title       String
+  message     String   @db.Text
+  data        Json?
+  read        Boolean  @default(false)
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("notifications")
+}
