@@ -49,7 +49,7 @@ const AboutPage: FC = () => (
               </p>
               <footer className="blockquote-footer">
                 Muriel Strode,{' '}
-                <cite title="Source Title">"Wind-Wafted Wild Flowers" - The Open Court, 1903</cite>
+                <cite title="Source Title">&ldquo;Wind-Wafted Wild Flowers&rdquo; - The Open Court, 1903</cite>
               </footer>
             </blockquote>
           </CardBody>
